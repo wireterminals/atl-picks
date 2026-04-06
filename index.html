@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATL Picks — What to Do in Atlanta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --atl-red: #E8341C;
+      --atl-gold: #F5B614;
+      --atl-teal: #00B4A6;
+      --atl-navy: #1A2340;
+      --atl-lime: #8CC63F;
+      --atl-purple: #7B4FCC;
+      --bg: #FFF8EE;
+      --card-bg: #FFFFFF;
+      --text: #1A2340;
+      --muted: #8A8FA8;
+      --border: #EDE8DF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── CONFETTI BG ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(232,52,28,0.07) 0%, transparent 40%),
+        radial-gradient(circle at 85% 10%, rgba(0,180,166,0.08) 0%, transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(245,182,20,0.06) 0%, transparent 45%),
+        radial-gradient(circle at 90% 70%, rgba(123,79,204,0.06) 0%, transparent 35%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 0 2rem;
+      background: var(--atl-navy);
+      overflow: hidden;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 0 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .header-deco {
+      position: absolute;
+      top: -30px; right: -60px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,52,28,0.25), transparent 70%);
+      pointer-events: none;
+    }
+    .header-deco2 {
+      position: absolute;
+      bottom: -40px; left: -50px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,180,166,0.2), transparent 70%);
+      pointer-events: none;
+    }
+
+    .site-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--atl-gold);
+      text-transform: uppercase;
+    }
+
+    .site-title {
+      font-family: 'Righteous', cursive;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .site-title span {
+      color: var(--atl-gold);
+    }
+
+    .site-subtitle {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.65);
+      max-width: 480px;
+      font-weight: 300;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 0.5rem;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Righteous', cursive;
+      font-size: 1.6rem;
+      color: var(--atl-teal);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .add-btn-header {
+      margin-top: 0.5rem;
+      background: var(--atl-red);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0.75rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(232,52,28,0.4);
+    }
+
+    .add-btn-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(232,52,28,0.5);
+    }
+
+    /* ── FILTER STRIP ── */
+    .filter-strip {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,248,238,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--border);
+      padding: 0.85rem 2rem;
+    }
+
+    .filter-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 0.5rem;
+    }
+
+    .filter-btn {
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 50px;
+      padding: 0.35rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .filter-btn:hover { border-color: var(--atl-teal); color: var(--atl-teal); }
+    .filter-btn.active {
+      background: var(--atl-navy);
+      border-color: var(--atl-navy);
+      color: white;
+    }
+
+    .sort-select {
+      margin-left: auto;
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 50px;
+      padding: 0.35rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text);
+      outline: none;
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 5rem;
+    }
+
+    .section-heading {
+      font-family: 'Righteous', cursive;
+      font-size: 1.4rem;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    /* ── CARD GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      animation: cardIn 0.4s ease both;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(26,35,64,0.1);
+      border-color: #ccc;
+    }
+
+    .card-color-bar {
+      height: 5px;
+      width: 100%;
+    }
+
+    .card-body {
+      padding: 1.1rem 1.2rem 0.8rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .card-name {
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .cat-pill {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 50px;
+      padding: 0.2rem 0.65rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 1.2rem;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    .submitter {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .submitter span { color: var(--text); font-weight: 500; }
+
+    /* ── VOTE BUTTON ── */
+    .vote-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: none;
+      border: 2px solid var(--border);
+      border-radius: 50px;
+      padding: 0.3rem 0.85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--muted);
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .vote-btn:hover {
+      border-color: var(--atl-red);
+      color: var(--atl-red);
+    }
+
+    .vote-btn.voted {
+      background: var(--atl-red);
+      border-color: var(--atl-red);
+      color: white;
+      animation: votePop 0.25s ease;
+    }
+
+    @keyframes votePop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .vote-arrow {
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,35,64,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 24px 60px rgba(26,35,64,0.25);
+      transform: translateY(20px);
+      transition: transform 0.25s;
+      position: relative;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0);
+    }
+
+    .modal-title {
+      font-family: 'Righteous', cursive;
+      font-size: 1.6rem;
+      color: var(--atl-navy);
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title span { color: var(--atl-red); }
+
+    .modal-close {
+      position: absolute;
+      top: 1.2rem; right: 1.2rem;
+      background: var(--border);
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: background 0.15s;
+    }
+
+    .modal-close:hover { background: #ddd; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+      background: white;
+      width: 100%;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--atl-teal);
+    }
+
+    .form-textarea { resize: vertical; min-height: 90px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--atl-red);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-top: 0.5rem;
+    }
+
+    .submit-btn:hover {
+      background: #c82a15;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(232,52,28,0.35);
+    }
+
+    /* empty state */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+      display: none;
+    }
+
+    .empty-state.visible { display: block; }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-family: 'Righteous', cursive; font-size: 1.3rem; color: var(--text); margin-bottom: 0.5rem; }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--atl-navy);
+      color: white;
+      border-radius: 50px;
+      padding: 0.75rem 1.75rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      z-index: 300;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(26,35,64,0.3);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      nav .filter-inner { gap: 0.4rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .header-stats { gap: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="header-deco"></div>
+    <div class="header-deco2"></div>
+    <p class="site-eyebrow">🍑 Atlanta, Georgia</p>
+    <h1 class="site-title">ATL <span>Picks</span></h1>
+    <p class="site-subtitle">The community-powered guide to the best Atlanta has to offer. Vote up your favorites, add hidden gems.</p>
+    <div class="header-stats">
+      <div class="stat">
+        <span class="stat-num" id="total-count">0</span>
+        <span class="stat-label">Activities</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="total-votes">0</span>
+        <span class="stat-label">Total Votes</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="total-contributors">0</span>
+        <span class="stat-label">Contributors</span>
+      </div>
+    </div>
+    <button class="add-btn-header" onclick="openModal()">＋ Add Your Pick</button>
+  </div>
+</header>
+
+<!-- FILTER STRIP -->
+<div class="filter-strip">
+  <div class="filter-inner">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" data-cat="all" onclick="setFilter('all', this)">🗺 All</button>
+    <button class="filter-btn" data-cat="Arts & Culture" onclick="setFilter('Arts & Culture', this)">🎨 Arts & Culture</button>
+    <button class="filter-btn" data-cat="Outdoor / Nature" onclick="setFilter('Outdoor / Nature', this)">🌿 Outdoor</button>
+    <button class="filter-btn" data-cat="Food & Drink" onclick="setFilter('Food & Drink', this)">🍔 Food & Drink</button>
+    <button class="filter-btn" data-cat="Sports & Recreation" onclick="setFilter('Sports & Recreation', this)">⚽ Sports</button>
+    <button class="filter-btn" data-cat="Nightlife" onclick="setFilter('Nightlife', this)">🌙 Nightlife</button>
+    <button class="filter-btn" data-cat="Family-Friendly" onclick="setFilter('Family-Friendly', this)">👨‍👩‍👧 Family</button>
+    <button class="filter-btn" data-cat="Hidden Gems" onclick="setFilter('Hidden Gems', this)">💎 Hidden Gems</button>
+    <select class="sort-select" id="sort-select" onchange="renderCards()">
+      <option value="votes">↑ Top Voted</option>
+      <option value="newest">🕐 Newest</option>
+      <option value="alpha">🔤 A–Z</option>
+    </select>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+  <h2 class="section-heading" id="section-label">All Picks</h2>
+  <div class="card-grid" id="card-grid"></div>
+  <div class="empty-state" id="empty-state">
+    <div class="empty-state-icon">🔍</div>
+    <h3>Nothing here yet</h3>
+    <p>Be the first to add a pick in this category!</p>
+  </div>
+</main>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 class="modal-title">Add Your <span>Pick</span></h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Activity Name *</label>
+        <input class="form-input" id="f-name" type="text" placeholder="e.g. Ponce City Market" maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category *</label>
+        <select class="form-select" id="f-cat">
+          <option value="">Select…</option>
+          <option>Arts & Culture</option>
+          <option>Outdoor / Nature</option>
+          <option>Food & Drink</option>
+          <option>Sports & Recreation</option>
+          <option>Nightlife</option>
+          <option>Family-Friendly</option>
+          <option>Hidden Gems</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Short Description *</label>
+      <textarea class="form-textarea" id="f-desc" placeholder="Why is this worth doing? What makes it special?" maxlength="200"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Neighborhood / Area</label>
+        <input class="form-input" id="f-area" type="text" placeholder="e.g. Midtown, Decatur…" maxlength="50" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Name (optional)</label>
+        <input class="form-input" id="f-submitter" type="text" placeholder="Anonymous" maxlength="40" />
+      </div>
+    </div>
+    <button class="submit-btn" onclick="submitEntry()">🍑 Add to ATL Picks</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── CATEGORY CONFIG ──
+  const CAT_CONFIG = {
+    'Arts & Culture':      { color: '#7B4FCC', bg: 'rgba(123,79,204,0.12)', text: '#7B4FCC' },
+    'Outdoor / Nature':    { color: '#8CC63F', bg: 'rgba(140,198,63,0.15)', text: '#5a8a1a' },
+    'Food & Drink':        { color: '#E8341C', bg: 'rgba(232,52,28,0.12)', text: '#E8341C' },
+    'Sports & Recreation': { color: '#00B4A6', bg: 'rgba(0,180,166,0.12)', text: '#00857a' },
+    'Nightlife':           { color: '#1A2340', bg: 'rgba(26,35,64,0.1)', text: '#1A2340' },
+    'Family-Friendly':     { color: '#F5B614', bg: 'rgba(245,182,20,0.15)', text: '#a07400' },
+    'Hidden Gems':         { color: '#E8341C', bg: 'rgba(232,52,28,0.08)', text: '#c02a12' },
+  };
+
+  // ── SEED DATA ──
+  let entries = [
+    { id: 1, name: 'Beltline Eastside Trail', cat: 'Outdoor / Nature', desc: 'A 2.25-mile multi-use trail connecting neighborhoods with murals, food trucks, and green space all along the way.', area: 'Eastside / Inman Park', submitter: 'ATL Picks', votes: 47, voted: false, ts: Date.now() - 86400000*5 },
+    { id: 2, name: 'Georgia Aquarium', cat: 'Family-Friendly', desc: 'One of the largest aquariums in the world. The whale shark exhibit alone is worth the trip.', area: 'Downtown', submitter: 'ATL Picks', votes: 62, voted: false, ts: Date.now() - 86400000*10 },
+    { id: 3, name: 'Fox Theatre', cat: 'Arts & Culture', desc: 'A stunning 1929 Moorish-Egyptian movie palace turned performing arts venue. Catch a Broadway touring show or concert here.', area: 'Midtown', submitter: 'ATL Picks', votes: 38, voted: false, ts: Date.now() - 86400000*7 },
+    { id: 4, name: 'Ponce City Market', cat: 'Food & Drink', desc: 'Massive food hall and rooftop amusement park inside a gorgeous 1920s Sears building. The rooftop mini-golf at sunset is unbeatable.', area: 'Old Fourth Ward', submitter: 'ATL Picks', votes: 55, voted: false, ts: Date.now() - 86400000*3 },
+    { id: 5, name: 'Krog Street Tunnel', cat: 'Hidden Gems', desc: 'A constantly-evolving street art tunnel covered in murals by local artists. No two visits look the same.', area: 'Cabbagetown', submitter: 'ATL Picks', votes: 29, voted: false, ts: Date.now() - 86400000*4 },
+    { id: 6, name: 'SweetWater Brewery Tour', cat: 'Nightlife', desc: 'Free tours of one of Atlanta\'s most beloved craft breweries, including tastings. A classic ATL experience.', area: 'Westside', submitter: 'ATL Picks', votes: 33, voted: false, ts: Date.now() - 86400000*6 },
+    { id: 7, name: 'Braves Game at Truist Park', cat: 'Sports & Recreation', desc: 'The Battery entertainment district surrounding the stadium makes this a full day experience even if you\'re not a baseball fan.', area: 'Cumberland / Smyrna', submitter: 'ATL Picks', votes: 41, voted: false, ts: Date.now() - 86400000*8 },
+    { id: 8, name: 'Piedmont Park', cat: 'Outdoor / Nature', desc: 'Atlanta\'s Central Park — farmers markets, festivals, dog-watching, and Midtown skyline views from the great lawn.', area: 'Midtown', submitter: 'ATL Picks', votes: 50, voted: false, ts: Date.now() - 86400000*2 },
+    { id: 9, name: 'High Museum of Art', cat: 'Arts & Culture', desc: 'The premier art museum of the American Southeast with rotating world-class exhibitions and a stunning Renzo Piano building.', area: 'Midtown', submitter: 'ATL Picks', votes: 31, voted: false, ts: Date.now() - 86400000*9 },
+    { id: 10, name: 'Mary Mac\'s Tea Room', cat: 'Food & Drink', desc: 'A legendary Southern comfort food institution open since 1945. The fried chicken and pot likker are non-negotiable.', area: 'Midtown', submitter: 'ATL Picks', votes: 44, voted: false, ts: Date.now() - 86400000*11 },
+    { id: 11, name: 'Oakland Cemetery', cat: 'Hidden Gems', desc: 'A Victorian garden cemetery that doubles as a park and history museum. Margaret Mitchell is buried here.', area: 'Grant Park', submitter: 'ATL Picks', votes: 22, voted: false, ts: Date.now() - 86400000*12 },
+    { id: 12, name: 'Terminal West', cat: 'Nightlife', desc: 'Intimate live music venue in a converted warehouse. Great sound, great sight lines, and a killer patio.', area: 'Westside', submitter: 'ATL Picks', votes: 18, voted: false, ts: Date.now() - 86400000*14 },
+  ];
+
+  let nextId = entries.length + 1;
+  let currentFilter = 'all';
+
+  function loadFromStorage() {
+    try {
+      const saved = localStorage.getItem('atlpicks_entries');
+      if (saved) entries = JSON.parse(saved);
+      const nid = localStorage.getItem('atlpicks_nextid');
+      if (nid) nextId = parseInt(nid);
+    } catch(e) {}
+  }
+
+  function saveToStorage() {
+    try {
+      localStorage.setItem('atlpicks_entries', JSON.stringify(entries));
+      localStorage.setItem('atlpicks_nextid', String(nextId));
+    } catch(e) {}
+  }
+
+  function getSorted() {
+    const sort = document.getElementById('sort-select').value;
+    let list = currentFilter === 'all' ? [...entries] : entries.filter(e => e.cat === currentFilter);
+    if (sort === 'votes') list.sort((a,b) => b.votes - a.votes);
+    else if (sort === 'newest') list.sort((a,b) => b.ts - a.ts);
+    else list.sort((a,b) => a.name.localeCompare(b.name));
+    return list;
+  }
+
+  function renderCards() {
+    const grid = document.getElementById('card-grid');
+    const empty = document.getElementById('empty-state');
+    const list = getSorted();
+    grid.innerHTML = '';
+
+    if (list.length === 0) {
+      empty.classList.add('visible');
+      return;
+    }
+    empty.classList.remove('visible');
+
+    list.forEach((e, i) => {
+      const cfg = CAT_CONFIG[e.cat] || { color: '#888', bg: '#eee', text: '#555' };
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = `${i * 0.04}s`;
+      card.innerHTML = `
+        <div class="card-color-bar" style="background:${cfg.color}"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-name">${escHtml(e.name)}</div>
+            <span class="cat-pill" style="background:${cfg.bg};color:${cfg.text}">${escHtml(e.cat)}</span>
+          </div>
+          <div class="card-desc">${escHtml(e.desc)}${e.area ? `<br><span style="font-size:0.78rem;margin-top:0.3rem;display:inline-block">📍 ${escHtml(e.area)}</span>` : ''}</div>
+        </div>
+        <div class="card-footer">
+          <div class="submitter">Added by <span>${escHtml(e.submitter || 'Anonymous')}</span></div>
+          <button class="vote-btn ${e.voted ? 'voted' : ''}" onclick="vote(${e.id})">
+            <span class="vote-arrow">▲</span> ${e.votes}
+          </button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    updateStats();
+  }
+
+  function vote(id) {
+    const entry = entries.find(e => e.id === id);
+    if (!entry) return;
+    if (entry.voted) {
+      entry.votes--;
+      entry.voted = false;
+    } else {
+      entry.votes++;
+      entry.voted = true;
+      showToast('🍑 Upvote counted!');
+    }
+    saveToStorage();
+    renderCards();
+  }
+
+  function updateStats() {
+    document.getElementById('total-count').textContent = entries.length;
+    document.getElementById('total-votes').textContent = entries.reduce((s,e) => s + e.votes, 0);
+    const contributors = new Set(entries.map(e => e.submitter || 'Anonymous')).size;
+    document.getElementById('total-contributors').textContent = contributors;
+  }
+
+  function setFilter(cat, btn) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const label = document.getElementById('section-label');
+    label.textContent = cat === 'all' ? 'All Picks' : cat;
+    renderCards();
+  }
+
+  function openModal() {
+    document.getElementById('modal-overlay').classList.add('open');
+    document.getElementById('f-name').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    ['f-name','f-desc','f-area','f-submitter'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-cat').value = '';
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  function submitEntry() {
+    const name = document.getElementById('f-name').value.trim();
+    const cat  = document.getElementById('f-cat').value;
+    const desc = document.getElementById('f-desc').value.trim();
+    const area = document.getElementById('f-area').value.trim();
+    const sub  = document.getElementById('f-submitter').value.trim();
+
+    if (!name) { showToast('⚠️ Please enter an activity name'); return; }
+    if (!cat)  { showToast('⚠️ Please select a category'); return; }
+    if (!desc) { showToast('⚠️ Please add a short description'); return; }
+
+    entries.unshift({ id: nextId++, name, cat, desc, area, submitter: sub || 'Anonymous', votes: 1, voted: true, ts: Date.now() });
+    saveToStorage();
+    closeModal();
+    currentFilter = 'all';
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-cat="all"]').classList.add('active');
+    document.getElementById('section-label').textContent = 'All Picks';
+    document.getElementById('sort-select').value = 'newest';
+    renderCards();
+    showToast('✅ Your pick was added!');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── INIT ──
+  loadFromStorage();
+  renderCards();
+</script>
+</body>
+</html>
