@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATL Picks — What to Do in Atlanta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --atl-red: #E8341C;
+      --atl-gold: #F5B614;
+      --atl-teal: #00B4A6;
+      --atl-navy: #1A2340;
+      --atl-lime: #8CC63F;
+      --atl-purple: #7B4FCC;
+      --bg: #FFF8EE;
+      --card-bg: #FFFFFF;
+      --text: #1A2340;
+      --muted: #8A8FA8;
+      --border: #EDE8DF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(232,52,28,0.07) 0%, transparent 40%),
+        radial-gradient(circle at 85% 10%, rgba(0,180,166,0.08) 0%, transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(245,182,20,0.06) 0%, transparent 45%),
+        radial-gradient(circle at 90% 70%, rgba(123,79,204,0.06) 0%, transparent 35%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative; z-index: 10;
+      padding: 0 2rem;
+      background: var(--atl-navy);
+      overflow: hidden;
+    }
+
+    .header-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 3rem 0 2.5rem;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      gap: 1rem; position: relative;
+    }
+
+    .header-deco {
+      position: absolute; top: -30px; right: -60px;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,52,28,0.25), transparent 70%);
+      pointer-events: none;
+    }
+    .header-deco2 {
+      position: absolute; bottom: -40px; left: -50px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,180,166,0.2), transparent 70%);
+      pointer-events: none;
+    }
+
+    .site-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      color: var(--atl-gold); text-transform: uppercase;
+    }
+
+    .site-title {
+      font-family: 'Righteous', cursive;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      color: #fff; line-height: 1;
+    }
+    .site-title span { color: var(--atl-gold); }
+
+    .site-subtitle {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.65);
+      max-width: 480px; font-weight: 300;
+    }
+
+    .header-stats { display: flex; gap: 2rem; margin-top: 0.5rem; }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Righteous', cursive;
+      font-size: 1.6rem; color: var(--atl-teal); display: block;
+    }
+    .stat-label {
+      font-size: 0.72rem; color: rgba(255,255,255,0.45);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+
+    .add-btn-header {
+      margin-top: 0.5rem;
+      background: var(--atl-red); color: #fff;
+      border: none; border-radius: 50px;
+      padding: 0.75rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(232,52,28,0.4);
+    }
+    .add-btn-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(232,52,28,0.5);
+    }
+
+    .filter-strip {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,248,238,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--border);
+      padding: 0.85rem 2rem;
+    }
+
+    .filter-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; gap: 0.5rem;
+      flex-wrap: wrap; align-items: center;
+    }
+
+    .filter-label {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-right: 0.5rem;
+    }
+
+    .filter-btn {
+      border: 2px solid var(--border); background: white;
+      border-radius: 50px; padding: 0.35rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+      color: var(--text);
+    }
+    .filter-btn:hover { border-color: var(--atl-teal); color: var(--atl-teal); }
+    .filter-btn.active { background: var(--atl-navy); border-color: var(--atl-navy); color: white; }
+
+    .sort-select {
+      margin-left: auto;
+      border: 2px solid var(--border); background: white;
+      border-radius: 50px; padding: 0.35rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; color: var(--text); outline: none;
+    }
+
+    main {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 2.5rem 2rem 5rem;
+    }
+
+    .section-heading {
+      font-family: 'Righteous', cursive;
+      font-size: 1.4rem; color: var(--text);
+      margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .section-heading::after {
+      content: ''; flex: 1; height: 2px;
+      background: var(--border); border-radius: 2px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      animation: cardIn 0.4s ease both;
+      display: flex; flex-direction: column;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(26,35,64,0.1);
+      border-color: #ccc;
+    }
+
+    .card-color-bar { height: 5px; width: 100%; }
+
+    .card-body {
+      padding: 1.1rem 1.2rem 0.8rem;
+      flex: 1; display: flex;
+      flex-direction: column; gap: 0.55rem;
+    }
+
+    .card-top {
+      display: flex; align-items: flex-start; gap: 0.85rem;
+    }
+
+    .card-thumb {
+      width: 68px; height: 68px;
+      border-radius: 10px;
+      object-fit: cover; flex-shrink: 0;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .card-thumb-placeholder {
+      width: 68px; height: 68px;
+      border-radius: 10px; flex-shrink: 0;
+      display: none; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      background: var(--bg); border: 1px solid var(--border);
+    }
+
+    .card-title-group {
+      flex: 1; display: flex;
+      flex-direction: column; gap: 0.28rem;
+    }
+
+    .card-name { font-weight: 600; font-size: 1rem; line-height: 1.3; }
+
+    .cat-pill {
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: 50px; padding: 0.2rem 0.65rem;
+      white-space: nowrap; display: inline-block; width: fit-content;
+    }
+
+    .card-area { font-size: 0.78rem; color: var(--muted); }
+    .card-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.55; }
+
+    .card-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 1.2rem;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    .submitter { font-size: 0.75rem; color: var(--muted); }
+    .submitter span { color: var(--text); font-weight: 500; }
+
+    .vote-btn {
+      display: flex; align-items: center; gap: 0.45rem;
+      background: none; border: 2px solid var(--border);
+      border-radius: 50px; padding: 0.3rem 0.85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700; font-size: 0.9rem;
+      color: var(--muted); transition: all 0.15s;
+      user-select: none;
+    }
+    .vote-btn:hover { border-color: var(--atl-red); color: var(--atl-red); }
+    .vote-btn.voted {
+      background: var(--atl-red); border-color: var(--atl-red);
+      color: white; animation: votePop 0.25s ease;
+    }
+    @keyframes votePop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,35,64,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex; align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: #fff; border-radius: 20px;
+      padding: 2rem; width: 100%; max-width: 540px;
+      box-shadow: 0 24px 60px rgba(26,35,64,0.25);
+      transform: translateY(20px);
+      transition: transform 0.25s;
+      position: relative;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-title {
+      font-family: 'Righteous', cursive;
+      font-size: 1.6rem; color: var(--atl-navy);
+      margin-bottom: 1.5rem;
+    }
+    .modal-title span { color: var(--atl-red); }
+
+    .modal-close {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      background: var(--border); border: none; border-radius: 50%;
+      width: 32px; height: 32px; cursor: pointer;
+      font-size: 1.1rem; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--muted); transition: background 0.15s;
+    }
+    .modal-close:hover { background: #ddd; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .form-label {
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    }
+    .form-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .form-input, .form-textarea, .form-select {
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 0.7rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; color: var(--text);
+      outline: none; transition: border-color 0.15s;
+      background: white; width: 100%;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--atl-teal); }
+    .form-textarea { resize: vertical; min-height: 90px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .img-preview-wrap { margin-top: 0.6rem; display: none; }
+    .img-preview-wrap.visible { display: block; }
+    .img-preview {
+      width: 80px; height: 80px;
+      object-fit: cover; border-radius: 10px;
+      border: 2px solid var(--border);
+    }
+
+    .submit-btn {
+      width: 100%; background: var(--atl-red); color: white;
+      border: none; border-radius: 12px; padding: 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: all 0.15s; margin-top: 0.5rem;
+    }
+    .submit-btn:hover {
+      background: #c82a15; transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(232,52,28,0.35);
+    }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); display: none; }
+    .empty-state.visible { display: block; }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-family: 'Righteous', cursive; font-size: 1.3rem; color: var(--text); margin-bottom: 0.5rem; }
+
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--atl-navy); color: white;
+      border-radius: 50px; padding: 0.75rem 1.75rem;
+      font-size: 0.9rem; font-weight: 500;
+      z-index: 300; transition: transform 0.3s ease;
+      white-space: nowrap; box-shadow: 0 8px 24px rgba(26,35,64,0.3);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .header-stats { gap: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-deco"></div>
+    <div class="header-deco2"></div>
+    <p class="site-eyebrow">🍑 Atlanta, Georgia</p>
+    <h1 class="site-title">ATL <span>Picks</span></h1>
+    <p class="site-subtitle">The community-powered guide to the best Atlanta has to offer. Vote up your favorites, add hidden gems.</p>
+    <div class="header-stats">
+      <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Activities</span></div>
+      <div class="stat"><span class="stat-num" id="total-votes">0</span><span class="stat-label">Total Votes</span></div>
+      <div class="stat"><span class="stat-num" id="total-contributors">0</span><span class="stat-label">Contributors</span></div>
+      <div class="stat"><span class="stat-num" id="total-hits">—</span><span class="stat-label">Visitors</span></div>
+    </div>
+    <button class="add-btn-header" onclick="openModal()">＋ Add Your Pick</button>
+  </div>
+</header>
+
+<div class="filter-strip">
+  <div class="filter-inner">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" data-cat="all" onclick="setFilter('all',this)">🗺 All</button>
+    <button class="filter-btn" data-cat="Arts & Culture" onclick="setFilter('Arts & Culture',this)">🎨 Arts</button>
+    <button class="filter-btn" data-cat="Outdoor / Nature" onclick="setFilter('Outdoor / Nature',this)">🌿 Outdoor</button>
+    <button class="filter-btn" data-cat="Food & Drink" onclick="setFilter('Food & Drink',this)">🍔 Food</button>
+    <button class="filter-btn" data-cat="Sports & Recreation" onclick="setFilter('Sports & Recreation',this)">⚽ Sports</button>
+    <button class="filter-btn" data-cat="Nightlife" onclick="setFilter('Nightlife',this)">🌙 Nightlife</button>
+    <button class="filter-btn" data-cat="Family-Friendly" onclick="setFilter('Family-Friendly',this)">👨‍👩‍👧 Family</button>
+    <button class="filter-btn" data-cat="Hidden Gems" onclick="setFilter('Hidden Gems',this)">💎 Gems</button>
+    <select class="sort-select" id="sort-select" onchange="renderCards()">
+      <option value="votes">↑ Top Voted</option>
+      <option value="newest">🕐 Newest</option>
+      <option value="alpha">🔤 A–Z</option>
+    </select>
+  </div>
+</div>
+
+<main>
+  <h2 class="section-heading" id="section-label">All Picks</h2>
+  <div class="card-grid" id="card-grid"></div>
+  <div class="empty-state" id="empty-state">
+    <div class="empty-state-icon">🔍</div>
+    <h3>Nothing here yet</h3>
+    <p>Be the first to add a pick in this category!</p>
+  </div>
+</main>
+
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 class="modal-title">Add Your <span>Pick</span></h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Activity Name *</label>
+        <input class="form-input" id="f-name" type="text" placeholder="e.g. Ponce City Market" maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category *</label>
+        <select class="form-select" id="f-cat">
+          <option value="">Select…</option>
+          <option>Arts & Culture</option>
+          <option>Outdoor / Nature</option>
+          <option>Food & Drink</option>
+          <option>Sports & Recreation</option>
+          <option>Nightlife</option>
+          <option>Family-Friendly</option>
+          <option>Hidden Gems</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Short Description *</label>
+      <textarea class="form-textarea" id="f-desc" placeholder="Why is this worth doing? What makes it special?" maxlength="220"></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Neighborhood / Area</label>
+        <input class="form-input" id="f-area" type="text" placeholder="e.g. Midtown, Decatur…" maxlength="50" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Name (optional)</label>
+        <input class="form-input" id="f-submitter" type="text" placeholder="Anonymous" maxlength="40" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Image URL (optional)</label>
+      <input class="form-input" id="f-img" type="url" placeholder="https://… (leave blank for auto photo)" oninput="previewImg()" />
+      <p class="form-hint">Paste a direct image link, or leave blank and we'll pull a photo automatically.</p>
+      <div class="img-preview-wrap" id="img-preview-wrap">
+        <img class="img-preview" id="img-preview" src="" alt="Preview" onerror="this.parentElement.classList.remove('visible')" />
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="submitEntry()">🍑 Add to ATL Picks</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ── Supabase client ──────────────────────────────────────────────────────────
+  const SUPABASE_URL = 'https://ruxdeffsuleimxjadcyt.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1eGRlZmZzdWxlaW14amFkY3l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjIzMDAsImV4cCI6MjA5MTA5ODMwMH0.HqNAHSMLgIWATx1FpHyS-rt7M1jYV6tX2PD0mHyWkZ8';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const CAT_CONFIG = {
+    'Arts & Culture':      { color:'#7B4FCC', bg:'rgba(123,79,204,0.12)', text:'#7B4FCC', emoji:'🎨', kw:'art-museum-gallery' },
+    'Outdoor / Nature':    { color:'#8CC63F', bg:'rgba(140,198,63,0.15)', text:'#5a8a1a', emoji:'🌿', kw:'park-nature-trail' },
+    'Food & Drink':        { color:'#E8341C', bg:'rgba(232,52,28,0.12)',  text:'#E8341C', emoji:'🍔', kw:'restaurant-food-dining' },
+    'Sports & Recreation': { color:'#00B4A6', bg:'rgba(0,180,166,0.12)',  text:'#00857a', emoji:'⚽', kw:'sports-stadium-recreation' },
+    'Nightlife':           { color:'#1A2340', bg:'rgba(26,35,64,0.1)',    text:'#1A2340', emoji:'🌙', kw:'nightlife-bar-city' },
+    'Family-Friendly':     { color:'#F5B614', bg:'rgba(245,182,20,0.15)', text:'#a07400', emoji:'👨‍👩‍👧', kw:'family-fun-children' },
+    'Hidden Gems':         { color:'#E8341C', bg:'rgba(232,52,28,0.08)',  text:'#c02a12', emoji:'💎', kw:'hidden-gem-discovery' },
+  };
+
+  // Per-name keyword overrides for seed entries
+  const NAME_KW = {
+    'Beltline Eastside Trail':    'beltline-trail-path',
+    'Georgia Aquarium':           'aquarium-fish-underwater',
+    'Fox Theatre':                'historic-theater-ornate',
+    'Ponce City Market':          'food-hall-indoor-market',
+    'Krog Street Tunnel':         'street-art-graffiti-mural',
+    'SweetWater Brewery Tour':    'craft-beer-brewery',
+    'Braves Game at Truist Park': 'baseball-stadium-crowd',
+    'Piedmont Park':              'city-park-skyline',
+    'High Museum of Art':         'modern-art-museum',
+    "Mary Mac's Tea Room":        'southern-food-comfort',
+    'Oakland Cemetery':           'historic-cemetery-garden',
+    'Terminal West':              'live-music-concert-venue',
+  };
+
+  function thumbUrl(entry) {
+    if (entry.imgUrl && entry.imgUrl.trim()) return entry.imgUrl.trim();
+    const kw = NAME_KW[entry.name] || (CAT_CONFIG[entry.cat] && CAT_CONFIG[entry.cat].kw) || 'atlanta';
+    return `https://source.unsplash.com/128x128/?${encodeURIComponent(kw)}&sig=${entry.id * 17}`;
+  }
+
+  // Voted IDs stored locally so votes survive page reloads
+  let votedIds = new Set(JSON.parse(localStorage.getItem('atlpicks_voted') || '[]'));
+  let entries = [];
+  let currentFilter = 'all';
+
+  // ── Load entries from Supabase ───────────────────────────────────────────────
+  async function loadEntries() {
+    const { data, error } = await sb.from('entries').select('*');
+    if (error) { console.error('Load error:', error); showToast('⚠️ Could not load picks'); return; }
+    entries = (data || []).map(row => ({
+      id:        row.id,
+      name:      row.name,
+      cat:       row.cat,
+      desc:      row.description,
+      area:      row.area,
+      submitter: row.submitter,
+      votes:     row.votes || 0,
+      voted:     votedIds.has(row.id),
+      ts:        new Date(row.created_at).getTime(),
+      imgUrl:    row.img_url || '',
+    }));
+    renderCards();
+  }
+
+  function getSorted() {
+    const sort = document.getElementById('sort-select').value;
+    let list = currentFilter === 'all' ? [...entries] : entries.filter(e => e.cat === currentFilter);
+    if (sort === 'votes') list.sort((a,b) => b.votes - a.votes);
+    else if (sort === 'newest') list.sort((a,b) => b.ts - a.ts);
+    else list.sort((a,b) => a.name.localeCompare(b.name));
+    return list;
+  }
+
+  function renderCards() {
+    const grid = document.getElementById('card-grid');
+    const empty = document.getElementById('empty-state');
+    const list = getSorted();
+    grid.innerHTML = '';
+
+    if (!list.length) { empty.classList.add('visible'); updateStats(); return; }
+    empty.classList.remove('visible');
+
+    list.forEach((e, i) => {
+      const cfg = CAT_CONFIG[e.cat] || { color:'#888', bg:'#eee', text:'#555', emoji:'📍' };
+      const src = thumbUrl(e);
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = `${i * 0.04}s`;
+      card.innerHTML = `
+        <div class="card-color-bar" style="background:${cfg.color}"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <img class="card-thumb" src="${esc(src)}" alt="${esc(e.name)}" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+            <div class="card-thumb-placeholder">${cfg.emoji}</div>
+            <div class="card-title-group">
+              <div class="card-name">${esc(e.name)}</div>
+              <span class="cat-pill" style="background:${cfg.bg};color:${cfg.text}">${esc(e.cat)}</span>
+              ${e.area ? `<div class="card-area">📍 ${esc(e.area)}</div>` : ''}
+            </div>
+          </div>
+          <div class="card-desc">${esc(e.desc)}</div>
+        </div>
+        <div class="card-footer">
+          <div class="submitter">Added by <span>${esc(e.submitter||'Anonymous')}</span></div>
+          <button class="vote-btn ${e.voted?'voted':''}" onclick="vote(${e.id})">▲ ${e.votes}</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+    updateStats();
+  }
+
+  // ── Vote ─────────────────────────────────────────────────────────────────────
+  async function vote(id) {
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    const newVotes = e.voted ? e.votes - 1 : e.votes + 1;
+    const { error } = await sb.from('entries').update({ votes: newVotes }).eq('id', id);
+    if (error) { showToast('⚠️ Vote failed, try again'); return; }
+    e.votes = newVotes;
+    if (e.voted) { e.voted = false; votedIds.delete(id); }
+    else { e.voted = true; votedIds.add(id); showToast('🍑 Upvote counted!'); }
+    localStorage.setItem('atlpicks_voted', JSON.stringify([...votedIds]));
+    renderCards();
+  }
+
+  function updateStats() {
+    document.getElementById('total-count').textContent = entries.length;
+    document.getElementById('total-votes').textContent = entries.reduce((s,e)=>s+e.votes,0);
+    document.getElementById('total-contributors').textContent = new Set(entries.map(e=>e.submitter||'Anonymous')).size;
+  }
+
+  function setFilter(cat, btn) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('section-label').textContent = cat==='all' ? 'All Picks' : cat;
+    renderCards();
+  }
+
+  function openModal() {
+    document.getElementById('modal-overlay').classList.add('open');
+    document.getElementById('f-name').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    ['f-name','f-desc','f-area','f-submitter','f-img'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-cat').value='';
+    document.getElementById('img-preview-wrap').classList.remove('visible');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target===document.getElementById('modal-overlay')) closeModal();
+  }
+
+  function previewImg() {
+    const url = document.getElementById('f-img').value.trim();
+    const wrap = document.getElementById('img-preview-wrap');
+    const img  = document.getElementById('img-preview');
+    if (url) { img.src=url; wrap.classList.add('visible'); }
+    else { wrap.classList.remove('visible'); }
+  }
+
+  // ── Submit new pick to Supabase ───────────────────────────────────────────────
+  async function submitEntry() {
+    const name = document.getElementById('f-name').value.trim();
+    const cat  = document.getElementById('f-cat').value;
+    const desc = document.getElementById('f-desc').value.trim();
+    const area = document.getElementById('f-area').value.trim();
+    const sub  = document.getElementById('f-submitter').value.trim();
+    const img  = document.getElementById('f-img').value.trim();
+
+    if (!name) { showToast('⚠️ Please enter an activity name'); return; }
+    if (!cat)  { showToast('⚠️ Please select a category'); return; }
+    if (!desc) { showToast('⚠️ Please add a short description'); return; }
+
+    const btn = document.querySelector('.submit-btn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    const { data, error } = await sb.from('entries').insert([{
+      name,
+      cat,
+      description: desc,
+      area:        area || null,
+      submitter:   sub  || 'Anonymous',
+      img_url:     img  || null,
+      votes:       1,
+    }]).select().single();
+
+    btn.disabled = false; btn.textContent = '🍑 Add to ATL Picks';
+
+    if (error) { showToast('⚠️ Could not save: ' + error.message); return; }
+
+    votedIds.add(data.id);
+    localStorage.setItem('atlpicks_voted', JSON.stringify([...votedIds]));
+
+    closeModal();
+    currentFilter='all';
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('[data-cat="all"]').classList.add('active');
+    document.getElementById('section-label').textContent='All Picks';
+    document.getElementById('sort-select').value='newest';
+    await loadEntries();
+    showToast('✅ Your pick was added!');
+  }
+
+  function showToast(msg) {
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2800);
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Hit counter ──────────────────────────────────────────────────────────────
+  async function incrementHits() {
+    // Read current value
+    const { data, error } = await sb.from('site_stats').select('value').eq('key', 'hits').single();
+    if (error) return;
+    const newVal = (data.value || 0) + 1;
+    await sb.from('site_stats').update({ value: newVal }).eq('key', 'hits');
+    document.getElementById('total-hits').textContent = newVal.toLocaleString();
+  }
+
+  loadEntries();
+  incrementHits();
+</script>
+</body>
+</html>
