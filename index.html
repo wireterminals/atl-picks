@@ -22,7 +22,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; background: #FFF8EE; }
 
     @keyframes gradientShift {
       0%   { background-position: 0% 50%; }
@@ -52,7 +52,7 @@
     }
 
     body {
-      background: #FFF8EE;
+      background: transparent;
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
@@ -177,7 +177,7 @@
 
     .filter-strip {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(255,248,238,0.95);
+      background: rgba(255,248,238,0.7);
       backdrop-filter: blur(12px);
       border-bottom: 2px solid var(--border);
       padding: 0.85rem 2rem;
@@ -239,7 +239,9 @@
     }
 
     .card {
-      background: var(--card-bg);
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border: 2px solid var(--border);
       border-radius: 16px; overflow: hidden;
       transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
