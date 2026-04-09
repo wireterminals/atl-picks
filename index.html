@@ -22,7 +22,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; background: #FFF8EE; }
+    html { scroll-behavior: smooth; }
 
     @keyframes gradientShift {
       0%   { background-position: 0% 50%; }
@@ -30,76 +30,17 @@
       100% { background-position: 0% 50%; }
     }
 
-    @keyframes blob1 {
-      0%, 100% { transform: translate(0px, 0px) scale(1); }
-      33%       { transform: translate(40px, -30px) scale(1.1); }
-      66%       { transform: translate(-20px, 20px) scale(0.95); }
-    }
-    @keyframes blob2 {
-      0%, 100% { transform: translate(0px, 0px) scale(1); }
-      33%       { transform: translate(-50px, 30px) scale(1.05); }
-      66%       { transform: translate(30px, -40px) scale(1.1); }
-    }
-    @keyframes blob3 {
-      0%, 100% { transform: translate(0px, 0px) scale(1); }
-      33%       { transform: translate(30px, 50px) scale(0.9); }
-      66%       { transform: translate(-40px, -20px) scale(1.05); }
-    }
-    @keyframes blob4 {
-      0%, 100% { transform: translate(0px, 0px) scale(1); }
-      33%       { transform: translate(-30px, -50px) scale(1.1); }
-      66%       { transform: translate(50px, 30px) scale(0.95); }
-    }
-
     body {
-      background: transparent;
+      background: linear-gradient(-45deg, #ffecd2, #ffd6cc, #d4f5f1, #fff3cc, #e8d5f5, #ffecd2);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       overflow-x: hidden;
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    .bg-blob {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.55;
-    }
-    .bg-blob-1 {
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(232,52,28,0.35), transparent 70%);
-      top: -100px; left: -100px;
-      animation: blob1 12s ease-in-out infinite;
-    }
-    .bg-blob-2 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(0,180,166,0.3), transparent 70%);
-      top: 10%; right: -80px;
-      animation: blob2 15s ease-in-out infinite;
-    }
-    .bg-blob-3 {
-      width: 550px; height: 550px;
-      background: radial-gradient(circle, rgba(245,182,20,0.25), transparent 70%);
-      bottom: 10%; left: 20%;
-      animation: blob3 18s ease-in-out infinite;
-    }
-    .bg-blob-4 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(123,79,204,0.25), transparent 70%);
-      bottom: -80px; right: 10%;
-      animation: blob4 14s ease-in-out infinite;
-    }
+    body::before { display: none; }
 
     header {
       position: relative; z-index: 10;
@@ -440,11 +381,6 @@
   </style>
 </head>
 <body>
-
-<div class="bg-blob bg-blob-1"></div>
-<div class="bg-blob bg-blob-2"></div>
-<div class="bg-blob bg-blob-3"></div>
-<div class="bg-blob bg-blob-4"></div>
 
 <header>
   <div class="header-inner">
