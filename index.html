@@ -24,23 +24,23 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
-    @keyframes gradientShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     body {
-      background: linear-gradient(-45deg, #ffecd2, #ffd6cc, #d4f5f1, #fff3cc, #e8d5f5, #ffecd2);
-      background-size: 400% 400%;
-      animation: gradientShift 12s ease infinite;
+      background: var(--bg);
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       overflow-x: hidden;
     }
 
-    body::before { display: none; }
+    /* Fixed pine forest backdrop (a fixed pseudo-element works on mobile,
+       unlike background-attachment: fixed) */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        linear-gradient(rgba(255,248,238,0.5), rgba(255,248,238,0.5)),
+        url('assets/pine-forest.jpg') center / cover no-repeat;
+    }
 
     header {
       position: relative; z-index: 10;
