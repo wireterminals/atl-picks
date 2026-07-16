@@ -201,6 +201,19 @@
       border-color: #ccc;
     }
 
+    /* Entries with a photo use it as the card background, under a light wash */
+    .card.has-photo {
+      background-size: cover;
+      background-position: center;
+    }
+    .card.has-photo .card-thumb-placeholder { display: none !important; }
+    .card.has-photo .card-desc,
+    .card.has-photo .card-area,
+    .card.has-photo .submitter { color: #3d4460; }
+    .card.has-photo .card-footer {
+      border-top-color: rgba(26,35,64,0.15);
+    }
+
     .card-color-bar { height: 5px; width: 100%; }
 
     .card-body {
@@ -500,9 +513,10 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">Image URL (optional)</label>
-      <input class="form-input" id="f-img" type="url" placeholder="https://… (leave blank for auto photo)" oninput="previewImg()" />
-      <p class="form-hint">Paste a direct image link, or leave blank and we'll pull a photo automatically.</p>
+      <label class="form-label">Photo (optional)</label>
+      <input class="form-input" id="f-file" type="file" accept="image/*" onchange="fileSelected()" />
+      <input class="form-input" id="f-img" type="url" placeholder="…or paste an image URL instead" oninput="previewImg()" style="margin-top:0.4rem" />
+      <p class="form-hint">Upload a photo (or paste a link) — it becomes the background of your pick's card.</p>
       <div class="img-preview-wrap" id="img-preview-wrap">
         <img class="img-preview" id="img-preview" src="" alt="Preview" onerror="this.parentElement.classList.remove('visible')" />
       </div>
@@ -536,28 +550,6 @@
     'Family-Friendly':     { color:'#F5B614', bg:'rgba(245,182,20,0.15)', text:'#a07400', emoji:'👨‍👩‍👧', kw:'family-fun-children' },
     'Hidden Gems':         { color:'#E8341C', bg:'rgba(232,52,28,0.08)',  text:'#c02a12', emoji:'💎', kw:'hidden-gem-discovery' },
   };
-
-  // Per-name keyword overrides for seed entries
-  const NAME_KW = {
-    'Beltline Eastside Trail':    'beltline-trail-path',
-    'Georgia Aquarium':           'aquarium-fish-underwater',
-    'Fox Theatre':                'historic-theater-ornate',
-    'Ponce City Market':          'food-hall-indoor-market',
-    'Krog Street Tunnel':         'street-art-graffiti-mural',
-    'SweetWater Brewery Tour':    'craft-beer-brewery',
-    'Braves Game at Truist Park': 'baseball-stadium-crowd',
-    'Piedmont Park':              'city-park-skyline',
-    'High Museum of Art':         'modern-art-museum',
-    "Mary Mac's Tea Room":        'southern-food-comfort',
-    'Oakland Cemetery':           'historic-cemetery-garden',
-    'Terminal West':              'live-music-concert-venue',
-  };
-
-  function thumbUrl(entry) {
-    if (entry.imgUrl && entry.imgUrl.trim()) return entry.imgUrl.trim();
-    const kw = NAME_KW[entry.name] || (CAT_CONFIG[entry.cat] && CAT_CONFIG[entry.cat].kw) || 'atlanta';
-    return `https://source.unsplash.com/128x128/?${encodeURIComponent(kw)}&sig=${entry.id * 17}`;
-  }
 
   // Voted IDs stored locally so votes survive page reloads
   let votedIds = new Set(JSON.parse(localStorage.getItem('atlpicks_voted') || '[]'));
@@ -605,17 +597,19 @@
 
     list.forEach((e, i) => {
       const cfg = CAT_CONFIG[e.cat] || { color:'#888', bg:'#eee', text:'#555', emoji:'📍' };
-      const src = thumbUrl(e);
+      const photo = (e.imgUrl || '').trim();
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = 'card' + (photo ? ' has-photo' : '');
+      if (photo) {
+        card.style.backgroundImage =
+          `linear-gradient(rgba(255,255,255,0.84), rgba(255,255,255,0.84)), url("${photo.replace(/"/g, '%22')}")`;
+      }
       card.style.animationDelay = `${i * 0.04}s`;
       card.innerHTML = `
         <div class="card-color-bar" style="background:${cfg.color}"></div>
         <div class="card-body">
           <div class="card-top">
-            <img class="card-thumb" src="${esc(src)}" alt="${esc(e.name)}" loading="lazy"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-            <div class="card-thumb-placeholder">${cfg.emoji}</div>
+            <div class="card-thumb-placeholder" style="display:flex">${cfg.emoji}</div>
             <div class="card-title-group">
               <div class="card-name">${esc(e.name)}</div>
               <span class="cat-pill" style="background:${cfg.bg};color:${cfg.text}">${esc(e.cat)}</span>
@@ -680,8 +674,9 @@
 
   function closeModal() {
     editingId = null;
+    selectedFile = null;
     document.getElementById('modal-overlay').classList.remove('open');
-    ['f-name','f-desc','f-area','f-submitter','f-img','f-link','f-edit-code'].forEach(id=>document.getElementById(id).value='');
+    ['f-name','f-desc','f-area','f-submitter','f-img','f-link','f-edit-code','f-file'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('f-cat').value='';
     document.getElementById('img-preview-wrap').classList.remove('visible');
   }
@@ -711,6 +706,8 @@
 
   function openEditModal(e) {
     editingId = e.id;
+    selectedFile = null;
+    document.getElementById('f-file').value = '';
     document.querySelector('.modal-title').innerHTML = 'Edit <span>Pick</span>';
     document.getElementById('modal-submit-btn').textContent = '💾 Save Changes';
     document.getElementById('edit-code-req').textContent = '(enter to change)';
@@ -740,7 +737,50 @@
     const wrap = document.getElementById('img-preview-wrap');
     const img  = document.getElementById('img-preview');
     if (url) { img.src=url; wrap.classList.add('visible'); }
-    else { wrap.classList.remove('visible'); }
+    else if (!selectedFile) { wrap.classList.remove('visible'); }
+  }
+
+  // ── Photo upload ─────────────────────────────────────────────────────────────
+  let selectedFile = null;
+
+  function fileSelected() {
+    const inp = document.getElementById('f-file');
+    selectedFile = (inp.files && inp.files[0]) || null;
+    const wrap = document.getElementById('img-preview-wrap');
+    const img  = document.getElementById('img-preview');
+    if (selectedFile) {
+      img.src = URL.createObjectURL(selectedFile);
+      wrap.classList.add('visible');
+    } else {
+      previewImg();
+    }
+  }
+
+  // Shrink big photos in the browser so uploads stay small and fast
+  function resizeImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(img.src);
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('could not process image')), 'image/jpeg', 0.85);
+      };
+      img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error('could not read image')); };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  async function uploadPhoto(file) {
+    const blob = await resizeImage(file);
+    const path = Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
+    const { error } = await sb.storage.from('entry-images').upload(path, blob, { contentType: 'image/jpeg' });
+    if (error) throw new Error(error.message);
+    return sb.storage.from('entry-images').getPublicUrl(path).data.publicUrl;
   }
 
   // ── Submit / update pick ─────────────────────────────────────────────────────
@@ -750,9 +790,9 @@
     const desc     = document.getElementById('f-desc').value.trim();
     const area     = document.getElementById('f-area').value.trim();
     const sub      = document.getElementById('f-submitter').value.trim();
-    const img      = document.getElementById('f-img').value.trim();
     const link     = document.getElementById('f-link').value.trim();
     const codeRaw  = document.getElementById('f-edit-code').value.trim();
+    let   img      = document.getElementById('f-img').value.trim();
 
     if (!name) { showToast('⚠️ Please enter an activity name'); return; }
     if (!cat)  { showToast('⚠️ Please select a category'); return; }
@@ -761,6 +801,19 @@
     const btn = document.getElementById('modal-submit-btn');
     const origText = btn.textContent;
     btn.disabled = true; btn.textContent = 'Saving…';
+
+    // An uploaded photo wins over a pasted URL
+    if (selectedFile) {
+      btn.textContent = 'Uploading photo…';
+      try {
+        img = await uploadPhoto(selectedFile);
+      } catch (err) {
+        btn.disabled = false; btn.textContent = origText;
+        showToast('⚠️ Photo upload failed: ' + err.message);
+        return;
+      }
+      btn.textContent = 'Saving…';
+    }
 
     // ── Edit existing ──────────────────────────────────────────────────────────
     if (editingId !== null) {
