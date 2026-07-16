@@ -207,9 +207,14 @@
       background-position: center;
     }
     .card.has-photo .card-thumb-placeholder { display: none !important; }
+    .card.has-photo .card-name { color: #06091a; }
     .card.has-photo .card-desc,
     .card.has-photo .card-area,
-    .card.has-photo .submitter { color: #3d4460; }
+    .card.has-photo .submitter { color: #10152e; }
+    .card.has-photo .submitter span { color: #06091a; }
+    .card.has-photo .card-name,
+    .card.has-photo .card-desc,
+    .card.has-photo .card-area { text-shadow: 0 1px 3px rgba(255,255,255,0.75); }
     .card.has-photo .card-footer {
       border-top-color: rgba(26,35,64,0.15);
     }
@@ -602,7 +607,7 @@
       card.className = 'card' + (photo ? ' has-photo' : '');
       if (photo) {
         card.style.backgroundImage =
-          `linear-gradient(rgba(255,255,255,0.84), rgba(255,255,255,0.84)), url("${photo.replace(/"/g, '%22')}")`;
+          `linear-gradient(rgba(255,255,255,0.62), rgba(255,255,255,0.62)), url("${photo.replace(/"/g, '%22')}")`;
       }
       card.style.animationDelay = `${i * 0.04}s`;
       card.innerHTML = `
