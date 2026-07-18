@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ATL Picks — What to Do in Atlanta</title>
 
-  <meta name="description" content="The community-voted guide to the best things to do in Atlanta, Roswell, Sandy Springs, Alpharetta, Kennesaw & Acworth. Vote up your favorites and add your own hidden gems." />
+  <meta name="description" content="The community-voted guide to the best things to do in Atlanta, Roswell, Sandy Springs, Alpharetta, Kennesaw & Acworth. Vote, or add your own hidden gems." />
   <link rel="canonical" href="https://atlantapicks.com/" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍑</text></svg>" />
   <meta name="theme-color" content="#1A2340" />
@@ -607,7 +607,7 @@
   function getSorted() {
     const sort = document.getElementById('sort-select').value;
     let list = currentFilter === 'all' ? [...entries] : entries.filter(e => e.cat === currentFilter);
-    if (sort === 'votes') list.sort((a,b) => b.votes - a.votes);
+    if (sort === 'votes') list.sort((a,b) => b.votes - a.votes || b.ts - a.ts);
     else if (sort === 'newest') list.sort((a,b) => b.ts - a.ts);
     else list.sort((a,b) => a.name.localeCompare(b.name));
     return list;
@@ -626,6 +626,7 @@
       const cfg = CAT_CONFIG[e.cat] || { color:'#888', bg:'#eee', text:'#555', emoji:'📍' };
       const photo = (e.imgUrl || '').trim();
       const card = document.createElement('div');
+      card.dataset.id = e.id;
       card.className = 'card' + (photo ? ' has-photo' : '');
       if (photo) {
         card.style.backgroundImage =
@@ -893,8 +894,14 @@
     document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector('[data-cat="all"]').classList.add('active');
     document.getElementById('section-label').textContent='All Picks';
-    document.getElementById('sort-select').value='newest';
     await loadEntries();
+    // Keep Top Voted order; scroll to the new pick and flash it so it's easy to spot
+    const newCard = document.querySelector(`.card[data-id="${data.id}"]`);
+    if (newCard) {
+      newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      newCard.style.boxShadow = '0 0 0 4px var(--atl-gold)';
+      setTimeout(() => { newCard.style.boxShadow = ''; }, 3000);
+    }
     showToast('✅ Your pick was added!');
   }
 
