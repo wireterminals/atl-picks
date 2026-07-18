@@ -202,6 +202,7 @@
     }
 
     .card {
+      position: relative;
       background: rgba(255,255,255,0.94);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
@@ -421,6 +422,27 @@
     .submit-btn:hover {
       background: #c82a15; transform: translateY(-1px);
       box-shadow: 0 6px 20px rgba(232,52,28,0.35);
+    }
+
+    .vote-hint {
+      position: absolute;
+      bottom: 54px; right: 12px;
+      background: var(--atl-lime);
+      color: #fff; font-weight: 600; font-size: 0.85rem;
+      font-style: italic;
+      padding: 0.45rem 0.95rem; border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      cursor: pointer; z-index: 5;
+      white-space: nowrap; user-select: none;
+      animation: hintBob 1.6s ease-in-out infinite;
+    }
+    .vote-hint::after {
+      content: ''; position: absolute; top: 100%; right: 22px;
+      border: 7px solid transparent; border-top-color: var(--atl-lime);
+    }
+    @keyframes hintBob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
     }
 
     .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); display: none; }
@@ -657,7 +679,25 @@
       `;
       grid.appendChild(card);
     });
+    maybeShowVoteHint();
     updateStats();
+  }
+
+  // ── "Click to vote" hint for first-time visitors ─────────────────────────────
+  function maybeShowVoteHint() {
+    if (votedIds.size || localStorage.getItem('atlpicks_hint_done')) return;
+    const first = document.querySelector('.card');
+    if (!first) return;
+    const hint = document.createElement('div');
+    hint.className = 'vote-hint';
+    hint.textContent = 'Click to vote 👇';
+    hint.onclick = dismissVoteHint;
+    first.appendChild(hint);
+  }
+
+  function dismissVoteHint() {
+    localStorage.setItem('atlpicks_hint_done', '1');
+    document.querySelectorAll('.vote-hint').forEach(h => h.remove());
   }
 
   // ── Vote ─────────────────────────────────────────────────────────────────────
@@ -669,7 +709,7 @@
     if (error) { showToast('⚠️ Vote failed, try again'); return; }
     e.votes = newVotes;
     if (e.voted) { e.voted = false; votedIds.delete(id); }
-    else { e.voted = true; votedIds.add(id); showToast('🍑 Upvote counted!'); }
+    else { e.voted = true; votedIds.add(id); showToast('🍑 Upvote counted!'); dismissVoteHint(); }
     localStorage.setItem('atlpicks_voted', JSON.stringify([...votedIds]));
     renderCards();
   }
