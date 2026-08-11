@@ -621,7 +621,7 @@
       ts:        new Date(row.created_at).getTime(),
       imgUrl:    row.img_url || '',
       linkUrl:   row.link_url || '',
-      editCode:  row.edit_code || '',
+      hasCode:   !!row.has_edit_code,
     }));
     renderCards();
   }
@@ -704,10 +704,11 @@
   async function vote(id) {
     const e = entries.find(x => x.id === id);
     if (!e) return;
-    const newVotes = e.voted ? e.votes - 1 : e.votes + 1;
-    const { error } = await sb.from('entries').update({ votes: newVotes }).eq('id', id);
+    // The database applies the ±1 atomically and returns the new total,
+    // so simultaneous voters can't overwrite each other.
+    const { data, error } = await sb.rpc('vote_entry', { p_id: id, p_delta: e.voted ? -1 : 1 });
     if (error) { showToast('⚠️ Vote failed, try again'); return; }
-    e.votes = newVotes;
+    e.votes = data;
     if (e.voted) { e.voted = false; votedIds.delete(id); }
     else { e.voted = true; votedIds.add(id); showToast('🍑 Upvote counted!'); dismissVoteHint(); }
     localStorage.setItem('atlpicks_voted', JSON.stringify([...votedIds]));
@@ -729,9 +730,11 @@
   }
 
   let editingId = null;
+  let editingCode = '';
 
   function openModal() {
     editingId = null;
+    editingCode = '';
     document.getElementById('modal-overlay').classList.add('open');
     document.querySelector('.modal-title').innerHTML = 'Add Your <span>Pick</span>';
     document.getElementById('modal-submit-btn').textContent = '🍑 Add to ATL Picks';
@@ -742,6 +745,7 @@
 
   function closeModal() {
     editingId = null;
+    editingCode = '';
     selectedFile = null;
     document.getElementById('modal-overlay').classList.remove('open');
     ['f-name','f-desc','f-area','f-submitter','f-img','f-link','f-edit-code','f-file'].forEach(id=>document.getElementById(id).value='');
@@ -749,31 +753,29 @@
     document.getElementById('img-preview-wrap').classList.remove('visible');
   }
 
-  async function hashCode(code) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-
   async function promptEdit(id) {
     const e = entries.find(x => x.id === id);
     if (!e) return;
     // If no edit code stored, open directly (legacy entries)
-    if (!e.editCode) {
-      openEditModal(e);
+    if (!e.hasCode) {
+      openEditModal(e, '');
       return;
     }
     const code = prompt('Enter the edit code for "' + e.name + '":');
     if (code === null) return; // cancelled
-    const hashed = await hashCode(code);
-    if (hashed !== e.editCode) {
+    // Only the database can check this — the hash never reaches the browser.
+    const { data: ok, error } = await sb.rpc('verify_entry_code', { p_id: id, p_code: code });
+    if (error) { showToast('⚠️ Could not check that code, try again'); return; }
+    if (!ok) {
       showToast('❌ Wrong edit code');
       return;
     }
-    openEditModal(e);
+    openEditModal(e, code);
   }
 
-  function openEditModal(e) {
+  function openEditModal(e, code) {
     editingId = e.id;
+    editingCode = code || '';   // held only for this edit, sent with the save
     selectedFile = null;
     document.getElementById('f-file').value = '';
     document.querySelector('.modal-title').innerHTML = 'Edit <span>Pick</span>';
@@ -885,19 +887,20 @@
 
     // ── Edit existing ──────────────────────────────────────────────────────────
     if (editingId !== null) {
-      const payload = {
-        name,
-        cat,
-        description: desc,
-        area:        area || null,
-        submitter:   sub  || 'Anonymous',
-        img_url:     img  || null,
-        link_url:    link || null,
-      };
-      // Only update edit_code if a new one was entered
-      if (codeRaw) payload.edit_code = await hashCode(codeRaw);
-
-      const { error } = await sb.from('entries').update(payload).eq('id', editingId);
+      // The code is re-checked server-side here, not just when the modal opened.
+      // codeRaw is optional — blank keeps the existing code.
+      const { error } = await sb.rpc('update_entry', {
+        p_id:          editingId,
+        p_code:        editingCode,
+        p_name:        name,
+        p_cat:         cat,
+        p_description: desc,
+        p_area:        area || null,
+        p_submitter:   sub  || 'Anonymous',
+        p_img_url:     img  || null,
+        p_link_url:    link || null,
+        p_new_code:    codeRaw || null,
+      });
       btn.disabled = false; btn.textContent = origText;
       if (error) { showToast('⚠️ Could not save: ' + error.message); return; }
       closeModal();
@@ -908,25 +911,25 @@
 
     // ── New entry ──────────────────────────────────────────────────────────────
     if (!codeRaw) { showToast('⚠️ Please set an edit code'); btn.disabled=false; btn.textContent=origText; return; }
-    const codeHash = await hashCode(codeRaw);
 
-    const { data, error } = await sb.from('entries').insert([{
-      name,
-      cat,
-      description: desc,
-      area:        area  || null,
-      submitter:   sub   || 'Anonymous',
-      img_url:     img   || null,
-      link_url:    link  || null,
-      edit_code:   codeHash,
-      votes:       1,
-    }]).select().single();
+    // The code goes to the database as plain text over HTTPS and is salted and
+    // hashed there — the browser never handles the stored form.
+    const { data: newId, error } = await sb.rpc('create_entry', {
+      p_name:        name,
+      p_cat:         cat,
+      p_description: desc,
+      p_area:        area || null,
+      p_submitter:   sub  || 'Anonymous',
+      p_img_url:     img  || null,
+      p_link_url:    link || null,
+      p_code:        codeRaw,
+    });
 
     btn.disabled = false; btn.textContent = origText;
 
     if (error) { showToast('⚠️ Could not save: ' + error.message); return; }
 
-    votedIds.add(data.id);
+    votedIds.add(newId);
     localStorage.setItem('atlpicks_voted', JSON.stringify([...votedIds]));
 
     closeModal();
@@ -936,7 +939,7 @@
     document.getElementById('section-label').textContent='All Picks';
     await loadEntries();
     // Keep Top Voted order; scroll to the new pick and flash it so it's easy to spot
-    const newCard = document.querySelector(`.card[data-id="${data.id}"]`);
+    const newCard = document.querySelector(`.card[data-id="${newId}"]`);
     if (newCard) {
       newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       newCard.style.boxShadow = '0 0 0 4px var(--atl-gold)';
@@ -957,12 +960,10 @@
 
   // ── Hit counter ──────────────────────────────────────────────────────────────
   async function incrementHits() {
-    // Read current value
-    const { data, error } = await sb.from('site_stats').select('value').eq('key', 'hits').single();
+    // Incremented and returned in one atomic call
+    const { data, error } = await sb.rpc('increment_hits');
     if (error) return;
-    const newVal = (data.value || 0) + 1;
-    await sb.from('site_stats').update({ value: newVal }).eq('key', 'hits');
-    document.getElementById('total-hits').textContent = newVal.toLocaleString();
+    document.getElementById('total-hits').textContent = Number(data).toLocaleString();
   }
 
   loadEntries();
